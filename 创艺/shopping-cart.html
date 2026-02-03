@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>收银台</title>
+    <style>
+        body {
+            /* 使用相对路径设置背景图片 */
+            background-image: url('./images/收银台/背景.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        h1 {
+            color: rgb(19, 19, 19); /* 设置文本颜色为白色 */
+            margin-left: 250px; /* 向右移动 250px，可按需调整 */
+            font-size: 36px; /* 增大文字大小 */
+            display: flex; /* 使用 flex 布局 */
+            align-items: center; /* 垂直居中对齐 */
+        }
+        h1 img {
+            margin-right: 20px; /* 图片与文字之间的间距，可按需调整 */
+            width: 50px; /* 图片宽度，可按需调整 */
+            height: auto; /* 保持图片比例 */
+        }
+        h1 .price-text {
+            margin-left: 350px; /* 保持原有间距设置 */
+        }
+        /* 修改：新增 color: red 实现标红 */
+        h1 .price-number {
+            font-weight: bold; /* 加粗 */
+            font-size: 40px; /* 放大（原文字 36px） */
+            color: red; /* 新增：数字标红 */
+        }
+        /* 新增：图片容器样式 */
+        .product-images {
+            margin-top: 30px; 
+            margin-left: 250px;
+            display: flex;
+            flex-direction: column; /* 关键修改：竖直排列 */
+            gap: 20px; /* 竖直方向间距 */
+        }
+        .product-images img {
+            width: 150px; 
+            height: auto; 
+        }
+        /* 新增：单个支付方式容器样式 */
+        .payment-item {
+            display: flex; /* 水平排列图片和文字 */
+            align-items: center; /* 垂直居中对齐 */
+            gap: 15px; /* 图片与文字的间距 */
+        }
+        .payment-item span {
+            color: rgb(16, 16, 16); /* 文字颜色设为白色 */
+            font-size: 50px; /* 可根据需求调整文字大小 */
+        }
+        /* 图片容器样式（保持竖直排列） */
+        .product-images {
+            margin-top: 30px; 
+            margin-left: 250px;
+            display: flex;
+            flex-direction: column; 
+            gap: 20px; /* 支付方式之间的竖直间距 */
+        }
+        .product-images img {
+            width: 150px; 
+            height: auto; 
+        }
+        /* 新增：勾选框容器样式 */
+        .checkbox-container {
+            position: relative;
+            width: 24px; /* 勾选框尺寸 */
+            height: 24px;
+            flex-shrink: 0; /* 防止被压缩 */
+        }
+        /* 隐藏默认checkbox */
+        .select-checkbox {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 1;
+        }
+        /* 自定义空心方框 */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #333; /* 空心边框 */
+            background: #fff;
+        }
+        /* 选中时显示红色勾 */
+        .select-checkbox:checked ~ .checkmark::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0000;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>
+        <img src="images/收银台/logo.jpg" alt="左侧图片">
+        创艺”视“界~理想家收银台
+        <span class="price-text">应付金额<span class="price-number">558.25</span>元</span>
+    </h1>
+    <!-- 图片容器（调整为包含文字的结构） -->
+    <div class="product-images">
+        <!-- 微信支付：勾选框+图片+文字 -->
+        <div class="payment-item">
+            <label class="checkbox-container">
+                <input type="checkbox" class="select-checkbox">
+                <span class="checkmark"></span>
+            </label>
+            <img src="images/收银台/微信支付.jpg" alt="微信支付">
+            <span>微信支付</span>
+        </div>
+        <!-- 支付宝：勾选框+图片+文字 -->
+        <div class="payment-item">
+            <label class="checkbox-container">
+                <input type="checkbox" class="select-checkbox">
+                <span class="checkmark"></span>
+            </label>
+            <img src="images/收银台/支付宝.jpg" alt="支付宝">
+            <span>支付宝支付</span>
+        </div>
+        <!-- 瞳孔识别支付：勾选框+图片+文字 -->
+        <div class="payment-item">
+            <label class="checkbox-container">
+                <input type="checkbox" class="select-checkbox">
+                <span class="checkmark"></span>
+            </label>
+            <img src="images/收银台/瞳孔识别支付.png" alt="瞳孔识别支付">
+            <span>瞳孔识别支付</span>
+        </div>
+        <!-- 新增：新支付方式（补充跳转链接） -->
+        <div class="payment-item" style="margin-left: 900px;">
+            <!-- 添加<a>标签包裹图片，href设置为目标页面路径 -->
+            <a href="支付完成页.html" target="_blank">  <!-- target="_blank"表示新窗口打开（可选） -->
+                <img src="images/收银台/立即支付.png" alt="立即支付" style="width: 300px;">
+            </a>
+        </div>
+    </div>
+</body>
+</html>

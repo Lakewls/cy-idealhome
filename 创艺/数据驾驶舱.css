@@ -1,0 +1,114 @@
+body,html{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    overflow: auto;
+    position: relative;
+}
+
+.background {/* 背景图片 */
+    background-image: url("images/business/数据驾驶仓/数据驾驶舱.png");
+    /* 修改为 cover，使图片覆盖整个背景区域 */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: fixed; /* 固定定位铺满整个屏幕 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: -1; /* 放在其他内容后面 */
+}
+h1, h2 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: right;
+    width: 100%;
+    margin: 0;
+}
+h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4em;
+    margin: 0;
+    width: max-content;
+}
+
+h2 {
+    position: absolute;
+    top: calc(50% + 60px);
+    left: 48%;
+    transform: translateX(-50%);
+    font-size: 2em;
+    margin: 0;
+    padding-left: 50%; /* 让文字向右偏移一半容器宽度，实现右对齐 */
+    text-align: right;
+    width: max-content;
+    h2 {
+        font-weight: 900;
+        text-align: right;
+        letter-spacing: 2px;
+        color: rgb(19, 18, 18);
+        font-size: 48px;
+        margin: 0;
+        transition: all 0.3s ease;
+        display: block;
+        position: relative;
+        right: 0;
+        margin-top: 10px;
+        width: 100%;
+        box-sizing: border-box;
+        /* 使用 transform 向左移动，可按需调整数值 */
+        transform: translateX(-50px); 
+    }
+}
+.button-container {
+    position: absolute;
+    bottom: 60px;           /* 距离底部距离 */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 40px;              /* 两个方块之间的间距 */
+    justify-content: center;
+    z-index: 2;
+}
+
+.card {
+    display: inline-block;
+    width: 200px;
+    padding: 30px 20px;
+    background-color: rgba(255, 255, 255, 0.9); /* 半透明背景 */
+    border-radius: 12px;
+    text-align: center;
+    font-size: 1.2em;
+    color: #1f1e1e;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.05);
+}
+.card-icon {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 10px; /* 上下边距 */
+}
+
+.welcome-title {
+    color: rgb(235, 91, 103); /* 设置主标题颜色 */
+    margin-top: -70px; /* 往上移动，可按需调整数值 */
+}
+
+.welcome-subtitle {
+    color: rgb(235, 91, 103); /* 设置副标题颜色 */
+    margin-top: -60px; /* 往上移动，可按需调整数值 */
+}

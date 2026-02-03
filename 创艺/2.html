@@ -1,0 +1,1608 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>理想家主页</title>
+    <link rel="stylesheet" href="2.css">
+    <style>
+        /* 重置默认样式，去除body和html的边距 */
+        body, html {
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* 基础公共样式 */
+        .small-icon { width: 100px; height: 100px; object-fit: cover; }
+        .content-image { display: block; margin: 20px auto; max-width: 60%; width: 80%; }
+        .price-title { color: #d2b48c; font-size: 3.5em; }
+        .price-info { color: #d2b48c; font-size: 3.25em; }
+        .desc-text { font-weight: bold; font-size: 2.0em; margin-top: -20px; }
+
+        /* 图片轮播 */
+        .image-slider {
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            position: relative;
+        }
+        .image-list {
+            display: flex;
+            width: 300%;
+            height: 100%;
+            transition: transform 1s ease-in-out;
+        }
+        .image-list img {
+            width: 33.333%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .image-list img:hover { transform: scale(1.1); }
+
+        /* 鼠标悬停时图片缩放效果 */
+        .image-list img:hover {
+            transform: scale(1.1);
+        }
+        .nav-bar { margin: 20px 0; justify-content: center; }
+        .new-nav-bar { margin: 20px 0; justify-content: space-around; background-color: #add8e6; }
+
+        /* 小圆点 */
+        .dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        .dot.active { background-color: #fff; }
+
+        /* 激活状态的小圆点样式 */
+        .dot.active {
+            background-color: #fff;
+        }
+
+        /* 导航栏样式 */
+        .nav-bar,
+        .new-nav-bar {
+            display: flex;
+            margin: 20px 0;
+        }
+
+        .nav-bar .nav-item,
+        .new-nav-bar .nav-item {
+            text-decoration: none;
+            color: black;
+            padding: 5px 10px;
+            flex: 1; /* 平均分配空间 */
+            text-align: center; /* 居中对齐文本 */
+            margin: 0 5px; /* 统一外边距 */
+            position: relative;
+        }
+
+        .nav-bar .nav-item.active {
+            color: blue;
+        }
+
+        .new-nav-bar .nav-item {
+            background-color: #add8e6;
+        }
+
+        .new-nav-bar .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: red;
+        }
+
+        /* 内容区域样式 */
+        .new-content {
+            margin-top: 20px;
+            text-align: center;
+            height: auto;
+            overflow: visible;
+        }
+
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* 序号样式 */
+        .number-cell {
+            position: relative;
+            width: 5%;
+            text-align: center;
+            /* 增大字号 */
+            font-size: 32px; 
+            height: 60px;
+            line-height: 60px;
+        }
+        .number-cell::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            z-index: -1;
+            transition: background-color 0.3s ease;
+        }
+        .number-cell span {
+            color: #a9a9a9;
+            font-size: 32px;
+            transition: color 0.3s ease;
+        }
+        .number-cell:hover::before { background-color: #ffa500; }
+        .number-cell:hover span { color: white; }
+
+        /* 表格通用 */
+        table { width: 100%; border-collapse: collapse; }
+        td { text-align: center; padding: 10px; }
+        
+        /* 图片放大模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            margin: auto;
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close:hover {
+            color: #ccc;
+        }
+        
+        /* 环保弹窗样式 */
+        .eco-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .eco-modal-content {
+            background-color: white;
+            margin: 0 auto; /* 移除默认的margin */
+            padding: 0;
+            border: none;
+            border-radius: 10px;
+            width: 70%; /* 减小宽度 */
+            max-width: 500px; /* 设置最大宽度 */
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            position: absolute;
+            top: 50%; /* 定位到屏幕中央 */
+            left: 50%;
+            transform: translate(-50%, -50%); /* 完全居中 */
+            overflow: hidden;
+        }
+
+        .eco-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 2001;
+        }
+
+        .eco-close:hover {
+            color: black;
+        }
+
+        .eco-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="home" class="page-section">
+        <h2 class="section-title" style="text-align: center; background: #e6e6fa; padding: 10px; margin: 0;">理想家——首页</h2>
+        <div class="image-slider">
+            <div class="image-list" id="imageList">
+                <img src="images/首页/首页1.png" alt="图片1">
+                <img src="images/首页/首页2.png" alt="图片2">
+                <img src="images/首页/首页3.png" alt="图片3">
+            </div>
+            <div class="dots" id="dots">
+                <div class="dot active" onclick="changeImage(0)"></div>
+                <div class="dot" onclick="changeImage(1)"></div>
+                <div class="dot" onclick="changeImage(2)"></div>
+            </div>
+        </div>
+        <p style="text-align: center; margin: 10px 0; background: #add8e6; padding: 10px;">欢迎使用创艺视界理想家———装修云平台</p>
+        
+        <!-- 功能图标表格（简化内联样式） -->
+        <table>
+            <tr>
+                <td>
+                    <img src="images/首页/VR看房.png"  style="width: 100px; height: 100px; object-fit: cover;">
+                    <p>VR看房</p>
+                </td>
+                <td>
+                    <img src="images/首页/VR设计工坊.png"  style="width: 100px; height: 100px; object-fit: cover;">
+                    <p>VR设计工坊</p>
+                </td>
+                <td>
+                    <img src="images/首页/VR案例博物馆.png"  style="width: 100px; height: 100px; object-fit: cover;">
+                    <p>VR案例博物馆</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <img src="images/首页/商户信息馆.png"  style="width: 100px; height: 100px; object-fit: cover;">
+                    <p>商户信息馆</p>
+                </td>
+                <td>
+                    <img src="images/首页/商户信息馆.png"  style="width: 100px; height: 100px; object-fit: cover;">
+                    <p>图纸设计</p>
+                </td>
+                <td>
+                    <img src="images/首页/智能预算管家.png"  style="width: 100px; height: 100px; object-fit: cover;">
+                    <p>智能预算管家</p>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 推荐内容（使用公共类替代内联样式） -->
+        <div class="new-nav-bar">
+            <a href="#" class="nav-item" onclick="showNewContent('content1')">推荐</a>
+            <a href="#" class="nav-item" onclick="showNewContent('content2')">优选设计</a>
+            <a href="#" class="nav-item" onclick="showNewContent('content3')">精选风格榜</a>
+            <a href="#" class="nav-item" onclick="showNewContent('content4')">环保甄选</a>
+        </div>
+        <div id="content1" class="new-content">
+            <!-- 放大推荐 1 图片，增加 width 属性值拉宽图片 -->
+            <img src="images/首页/推荐/新中式.jpg"  style="display: block; margin: 20px auto; max-width: 60%; width: 80%;">
+            <!-- 放大字体 -->
+            <p style="text-align: center; margin-top: 5px; color: #d2b48c; font-size: 3.5em;">AI装修成功经典案例</p>
+            <!-- 通过负的 margin-top 往上移动 -->
+            <p style="text-align: center; margin-top: -25px; color: #d2b48c; font-size: 3.25em;">139平米+4室2厅+45万+新中式</p>
+            <!-- 通过负的 margin-top 往上移动 -->
+            <p style="text-align: center; margin-top: -15px; font-weight: bold; font-size: 2.0em;">阳台设计休闲区，打造舒适惬意的放松空间</p>
+            <img src="images/首页/推荐/简欧.jpg" style="display: block; margin: 20px auto; max-width: 60%; width: 80%;">
+            <p style="text-align: center; margin-top: 5px; color: #d2b48c; font-size: 3.5em;">心意定制简欧家装</p>
+            <p style="text-align: center; margin-top: 5px; color: #d2b48c; font-size: 3.25em;">361平米+5居+67万+现代简欧</p>
+            <p style="text-align: center; margin-top: -20px; font-weight: bold; font-size: 2.0em;">玄关设计定制储物柜，进出门收纳无压力</p>
+            <img src="images/首页/推荐/日式.png" style="display: block; margin: 20px auto; max-width: 60%; width: 80%;">
+            <p style="text-align: center; margin-top: 5px; color: #d2b48c; font-size: 3.5em;">经典日式家装</p>
+            <p style="text-align: center; margin-top: 5px; color: #d2b48c; font-size: 3.25em;">160㎡+4室1厅+72万+日式原木风</p>
+            <p style="text-align: center; margin-top: -20px; font-weight: bold; font-size: 2.0em;">全屋地台+榻榻米设计，把侘寂美学融入日常起居的每一寸空间</p>
+            <img src="images/首页/推荐/自然风.jpg" style="display: block; margin: 20px auto; max-width: 60%; width: 80%;">
+            <p style="text-align: center; margin-top: 5px; color: #d2b48c; font-size: 3.5em;">自然风家装</p>
+            <p style="text-align: center; margin-top: 5px; color: #d2b48c; font-size: 3.25em;">120㎡+2室2厅+42万+自然风</p>
+            <p style="text-align: center; margin-top: -20px; font-weight: bold; font-size: 2.0em;">清新绿色设计，打造年轻人的休闲空间</p>
+            <img src="images/首页/推荐/摩登.png" style="display: block; margin: 20px auto; max-width: 60%; width: 80%;">
+            <p style="text-align: center; margin-top: 5px; color: #d2b48c; font-size: 3.5em;">现代摩登家装</p>
+            <p style="text-align: center; margin-top: 5px; color: #d2b48c; font-size: 3.25em;">126平米+3居+35万+摩登时尚风</p>
+            <p style="text-align: center; margin-top: -20px; font-weight: bold; font-size: 2.0em;">简约时尚摩登设计，紧跟时代最新潮流</p>
+        </div>
+
+        <!-- 优选设计（保留核心结构，简化内联） -->
+        <div id="content2" class="new-content">
+            <!-- 给表格添加 style-table 类 -->
+            <table class="style-table">
+                <tr>
+                    <td class="number-cell"><span>1</span></td>
+                    <!-- 给商家图片和信息所在的 td 添加 highlight-cell 类 -->
+                    <td class="highlight-cell">
+                        <img src="images/工作室/1.jpg"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 24px; text-align: left;">筑梦空间设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">全屋定制</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">环保材料</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">高性价比</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 22px; text-align: left;">★★★★★</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>2</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/2.jpg"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 24px; text-align: left;">素雅美学工作室</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">极简风格</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">一对一设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">工期透明</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">环保材料</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 22px; text-align: left;">★★★★★</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>3</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/3.jpg"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 24px; text-align: left;">匠人工坊装饰</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">老房改造</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">施工严谨</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">环保材料</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 22px; text-align: left;">★★★★☆</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>4</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/4.jpg"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 24px; text-align: left;">绿野家居设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">智能家居</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">绿植软装</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">免费量房</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 22px; text-align: left;">★★★★★</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>5</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/5.jpg"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">云端设计事务所</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">VR全景设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">轻奢风格</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">环保材料</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★☆☆</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>6</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/6.jpg"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">简舍生活设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">小户型优化</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">收纳大师</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">年轻化团队</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★★★</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>7</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/7.jpg" style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">古韵东方装饰</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">新中式风格</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">实木工艺</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">环保材料</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★★★</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>8</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/8.jpg"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">北欧风语设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">原木色系</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">北欧极简</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">软硬装一体</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★☆☆</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>9</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/9.jpg"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">创想家装工场</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">DIY定制</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">创意空间</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">预算可控</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★★☆</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>10</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/10.png"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">时光印记设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">复古混搭</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">旧物改造</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">情怀服务</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★★★</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>11</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/11.png"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">未来家智能装修</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">全屋智能</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">AI设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">科技感体验</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★★★</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>12</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/12.png" style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">森呼吸环保装饰</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">零甲醛材料</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">母婴级安全</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">空气检测</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★★☆</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>13</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/13.png"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">极速焕新工坊</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">7天快装</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">局部改造</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">无增项收费</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★☆☆</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>14</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/14.png"  style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">艺境空间设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">艺术化设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">软装搭配</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">高端私宅</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★★☆</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="number-cell"><span>15</span></td>
+                    <td class="highlight-cell">
+                        <img src="images/工作室/15.png" style="width: 10%; height: auto; object-fit: cover; cursor: pointer;">
+                    </td>
+                    <td class="highlight-cell">
+                        <p style="font-weight: bold; margin: 0; font-size: 22px; text-align: left;">暖居生活馆</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">家庭友好型</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">暖色调设计</p>
+                        <p style="color: #666; margin: 5px 0; font-size: 22px; text-align: left;">终身维护</p>
+                        <p style="color: #ffd700; margin: 5px 0; font-size: 18px; text-align: left;">★★★★★</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="content3" class="new-content">
+            <!-- 精选风格榜内容 -->
+            <table class="style-table">
+                <tr>
+                    <td class="highlight-cell">
+                        <img src="images/精选风格榜/精选风格榜1.png"  style="width: 200px; height: 200px; object-fit: cover;">
+                        <span style="font-weight: bold; font-size: 32px;">现代简约风格 —— 热度 ：90</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="highlight-cell">
+                        <img src="images/精选风格榜/精选风格榜2.png"  style="width: 200px; height: 200px; object-fit: cover;">
+                        <span style="font-weight: bold; font-size: 32px;">古典欧式风格 —— 热度 ：85</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="highlight-cell">
+                        <img src="images/精选风格榜/精选风格榜3.png"  style="width: 200px; height: 200px; object-fit: cover;">
+                        <span style="font-weight: bold; font-size: 32px;">中式风格 —— 热度 ：80</span>
+                    </td>
+                </tr>
+            </table>
+            <!-- 新增文字，增大字体大小 -->
+            <p style="font-weight: bold; font-size: 36px; margin-top: 20px;">现代简约风格案例</p>
+            <!-- 新增图片，铺满整个页面 -->
+            <img src="images/精选风格榜/4.png" style="display: block; margin: 20px auto; width: 65%; height: auto;">
+            <!-- 新增用户要求的说明文字，放大加粗 -->
+            <p style="text-align: center; margin: 10px 0; font-weight: bold; font-size: 30px;">简介大方的设计，注重空间利用</p>
+            <!-- 新增图片和文字容器，整体居中 -->
+            <div style="text-align: center; margin: 20px 0;">
+                <!-- 缩小图片，可按需调整宽高值 -->
+                <img src="images/设计师头像/1.jpg" style="display: inline-block; vertical-align: middle; margin-right: 10px; width: 80px; height: 80px;">
+                <!-- 增大字体大小 -->
+                <span style="display: inline-block; vertical-align: middle; font-size: 30px;">设计师：张三</span>
+            </div>
+            <!-- 新增图片，铺满整个页面 -->
+            <img src="images/精选风格榜/5.png" style="display: block; margin: 20px auto; width: 65%; height: auto;">
+            <!-- 新增用户要求的说明文字，放大加粗 -->
+            <p style="text-align: center; margin: 10px 0; font-weight: bold; font-size: 30px;">黑白灰配色，营造时尚氛围</p>
+            <!-- 新增图片和文字容器，整体居中 -->
+            <div style="text-align: center; margin: 20px 0;">
+                <!-- 缩小图片，可按需调整宽高值 -->
+                <img src="images/设计师头像/2.jpg" style="display: inline-block; vertical-align: middle; margin-right: 10px; width: 80px; height: 80px;">
+                <!-- 增大字体大小 -->
+                <span style="display: inline-block; vertical-align: middle; font-size: 30px;">设计师：李四</span>
+            </div>
+            <!-- 新增文字，增大字体大小 -->
+            <p style="font-weight: bold; font-size: 36px; margin-top: 20px;">古典欧式风格案例</p>
+            <!-- 新增图片，铺满整个页面 -->
+            <img src="images/精选风格榜/6.png" style="display: block; margin: 20px auto; width: 65%; height: auto;">
+            <!-- 新增用户要求的说明文字，放大加粗 -->
+            <p style="text-align: center; margin: 10px 0; font-weight: bold; font-size: 30px;">华丽的装饰，彰显高贵气质</p>
+            <!-- 新增图片和文字容器，整体居中 -->
+            <div style="text-align: center; margin: 20px 0;">
+                <!-- 缩小图片，可按需调整宽高值 -->
+                <img src="images/设计师头像/3.png" style="display: inline-block; vertical-align: middle; margin-right: 10px; width: 80px; height: 80px;">
+                <!-- 增大字体大小 -->
+                <span style="display: inline-block; vertical-align: middle; font-size: 30px;">设计师：王五</span>
+            </div>
+            <!-- 新增图片，铺满整个页面 -->
+            <img src="images/精选风格榜/精选风格榜1.png" style="display: block; margin: 20px auto; width: 65%; height: auto;">
+            <!-- 新增用户要求的说明文字，放大加粗 -->
+            <p style="text-align: center; margin: 10px 0; font-weight: bold; font-size: 30px;">雕花，罗马柱等元素的运用</p>
+            <!-- 新增图片和文字容器，整体居中 -->
+            <div style="text-align: center; margin: 20px 0;">
+                <!-- 缩小图片，可按需调整宽高值 -->
+                <img src="images/设计师头像/4.jpg" style="display: inline-block; vertical-align: middle; margin-right: 10px; width: 80px; height: 80px;">
+                <!-- 增大字体大小 -->
+                <span style="display: inline-block; vertical-align: middle; font-size: 30px;">设计师：赵六</span>
+            </div>
+            <!-- 新增文字，增大字体大小 -->
+            <p style="font-weight: bold; font-size: 36px; margin-top: 20px;">中式风格案例</p>
+            <!-- 新增图片，铺满整个页面 -->
+            <img src="images/精选风格榜/精选风格榜2.png" style="display: block; margin: 20px auto; width: 65%; height: auto;">
+            <!-- 新增用户要求的说明文字，放大加粗 -->
+            <p style="text-align: center; margin: 10px 0; font-weight: bold; font-size: 30px;">木质家具，展现传统文化韵味</p>
+            <!-- 新增图片和文字容器，整体居中 -->
+            <div style="text-align: center; margin: 20px 0;">
+                <!-- 缩小图片，可按需调整宽高值 -->
+                <img src="images/设计师头像/5.jpg" style="display: inline-block; vertical-align: middle; margin-right: 10px; width: 80px; height: 80px;">
+                <!-- 增大字体大小 -->
+                <span style="display: inline-block; vertical-align: middle; font-size: 30px;">设计师：孙七</span>
+            </div>
+            <!-- 新增图片，铺满整个页面 -->
+            <img src="images/精选风格榜/精选风格榜3.png" style="display: block; margin: 20px auto; width: 65%; height: auto;">
+            <!-- 新增用户要求的说明文字，放大加粗 -->
+            <p style="text-align: center; margin: 10px 0; font-weight: bold; font-size: 30px;">水墨画，青花瓷等元素的点缀</p>
+            <!-- 新增图片和文字容器，整体居中 -->
+            <div style="text-align: center; margin: 20px 0;">
+                <!-- 缩小图片，可按需调整宽高值 -->
+                <img src="images/设计师头像/6.jpg" style="display: inline-block; vertical-align: middle; margin-right: 10px; width: 80px; height: 80px;">
+                <!-- 增大字体大小 -->
+                <span style="display: inline-block; vertical-align: middle; font-size: 30px;">设计师：周八</span>
+            </div>
+        </div>
+        
+        <!-- 环保甄选内容 -->
+<div id="content4" class="new-content">
+    <!-- 环保甄选顶部视觉区 -->
+    <div style="display: flex; align-items: center; justify-content: center; padding: 20px; background-color: #f0f8f0; margin-bottom: 30px;">
+        <div style="text-align: center; flex: 1;">
+            <h2 style="font-size: 2.5em; color: #2e7d32; margin: 0; font-weight: bold; text-align: center;">环保装修享官方补贴</h2>
+        </div>
+    </div>
+    
+    <!-- 0甲醛部分 -->
+    <div style="display: flex; align-items: center; padding: 10px; margin-bottom: 15px;">
+        <div style="flex: 1; text-align: center; padding-right: 20px;">
+            <img src="images/环保甄选/0甲醛.png" style="width: 100%; max-width: 300px; height: 200px; object-fit: cover; border-radius: 10px;" alt="0甲醛认证">
+        </div>
+        <div style="flex: 1.5; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: flex-start;">
+                <div style="width: 20px; height: 20px; background-color: #4caf50; border-radius: 50%; display: inline-block; margin-right: 10px; flex-shrink: 0;"></div>
+                <div>
+                    <h3 style="margin: 0 0 5px 0; font-size: 1.3em; font-weight: bold; color: #2e7d32; text-align: left;">0 甲醛隐患</h3>
+                    <p style="margin: 0 0 0 0; font-size: 1em; color: #555; margin-left: 30px; text-align: left; line-height: 1.6;">环保材料甲醛释放量≤0.02mg/m³（国标≤0.08mg/m³），老人小孩住得更安心</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: flex-start;">
+                <div style="width: 20px; height: 20px; background-color: #4caf50; border-radius: 50%; display: inline-block; margin-right: 10px; flex-shrink: 0;"></div>
+                <div>
+                    <h3 style="margin: 0 0 5px 0; font-size: 1.3em; font-weight: bold; color: #2e7d32; text-align: left;">呼吸更清新</h3>
+                    <p style="margin: 0 0 0 0; font-size: 1em; color: #555; margin-left: 30px; text-align: left; line-height: 1.6;">全屋环保装修后，室内 PM2.5 值降低 60%，告别闷味、刺鼻感</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 省钱部分 -->
+    <div style="display: flex; align-items: center; padding: 10px; margin-bottom: 15px;">
+        <div style="flex: 1; text-align: center; padding-right: 20px;">
+            <img src="images/环保甄选/省钱.bmp" style="width: 100%; max-width: 300px; height: 200px; object-fit: cover; border-radius: 10px;" alt="省钱">
+        </div>
+        <div style="flex: 1.5; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: flex-start;">
+                <div style="width: 20px; height: 20px; background-color: #4caf50; border-radius: 50%; display: inline-block; margin-right: 10px; flex-shrink: 0;"></div>
+                <div>
+                    <h3 style="margin: 0 0 5px 0; font-size: 1.3em; font-weight: bold; color: #2e7d32; text-align: left;">长期更省钱</h3>
+                    <p style="margin: 0 0 0 0; font-size: 1em; color: #555; margin-left: 30px; text-align: left; line-height: 1.6;">环保材料耐用性提升 30%，减少后期维修 / 更换成本；节能建材（比如环保门窗、LED 灯）每月省电费 20-50 元</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: flex-start;">
+                <div style="width: 20px; height: 20px; background-color: #4caf50; border-radius: 50%; display: inline-block; margin-right: 10px; flex-shrink: 0;"></div>
+                <div>
+                    <h3 style="margin: 0 0 5px 0; font-size: 1.3em; font-weight: bold; color: #2e7d32; text-align: left;">补贴直接省</h3>
+                    <p style="margin: 0 0 0 0; font-size: 1em; color: #555; margin-left: 30px; text-align: left; line-height: 1.6;">官方 + 平台双重补贴，最高覆盖环保材料费用的 20%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 低碳部分 -->
+    <div style="display: flex; align-items: center; padding: 10px; margin-bottom: 15px;">
+        <div style="flex: 1; text-align: center; padding-right: 20px;">
+            <img src="images/环保甄选/低碳.jpeg" style="width: 100%; max-width: 300px; height: 200px; object-fit: cover; border-radius: 10px;" alt="低碳环保">
+        </div>
+        <div style="flex: 1.5; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: flex-start;">
+                <div style="width: 20px; height: 20px; background-color: #4caf50; border-radius: 50%; display: inline-block; margin-right: 10px; flex-shrink: 0;"></div>
+                <div>
+                    <h3 style="margin: 0 0 5px 0; font-size: 1.3em; font-weight: bold; color: #2e7d32; text-align: left;">低碳减碳</h3>
+                    <p style="margin: 0 0 0 0; font-size: 1em; color: #555; margin-left: 30px; text-align: left; line-height: 1.6;">一套 100㎡环保装修，每年减少碳排放约 800kg（相当于种 20 棵树）</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: flex-start;">
+                <div style="width: 20px; height: 20px; background-color: #4caf50; border-radius: 50%; display: inline-block; margin-right: 10px; flex-shrink: 0;"></div>
+                <div>
+                    <h3 style="margin: 0 0 5px 0; font-size: 1.3em; font-weight: bold; color: #2e7d32; text-align: left;">可回收利用</h3>
+                    <p style="margin: 0 0 0 0; font-size: 1em; color: #555; margin-left: 30px; text-align: left; line-height: 1.6;">装修废料回收率达 85%，减少建筑垃圾污染</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 环保甄选内容 -->
+    <table class="style-table">
+        <tr>
+            <td class="highlight-cell">
+                <img src="images/环保甄选/环保材料推荐.jpeg" style="width: 200px; height: 200px; object-fit: cover;">
+                <span style="font-weight: bold; font-size: 32px;">环保材料推荐 —— 热度 ：95</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="highlight-cell">
+                <img src="images/环保甄选/绿色设计理念.png" style="width: 200px; height: 200px; object-fit: cover;">
+                <span style="font-weight: bold; font-size: 32px;">绿色设计理念 —— 热度 ：92</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="highlight-cell">
+                <img src="images/环保甄选/可持续发展.png" style="width: 200px; height: 200px; object-fit: cover;">
+                <span style="font-weight: bold; font-size: 32px;">可持续发展方案 —— 热度 ：88</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="highlight-cell">
+                <img src="images/环保甄选/节能技术.png" style="width: 200px; height: 200px; object-fit: cover;">
+                <span style="font-weight: bold; font-size: 32px;">节能技术应用 —— 热度 ：85</span>
+            </td>
+        </tr>
+    </table>
+    
+    <!-- 示例内容 -->
+    <p style="font-weight: bold; font-size: 36px; margin-top: 20px;">都市森系小户型</p>
+    <img src="images/环保甄选/森系小户型.jpg" style="display: block; margin: 20px auto; width: 65%; height: auto;">
+    <p style="text-align: center; margin: 10px 0; font-weight: bold; font-size: 30px;">选用环保材料，守护健康生活</p>
+    
+    <div style="text-align: center; margin: 20px 0;">
+        <img src="images/设计师头像/环保专家.jpg" style="display: inline-block; vertical-align: middle; margin-right: 10px; width: 80px; height: 80px;">
+        <span style="display: inline-block; vertical-align: middle; font-size: 30px;">环保顾问：李环保</span>
+    </div>
+    
+    <p style="font-weight: bold; font-size: 36px; margin-top: 20px;">绿筑家</p>
+    <img src="images/环保甄选/绿筑家.jpg" style="display: block; margin: 20px auto; width: 65%; height: auto;">
+    <p style="text-align: center; margin: 10px 0; font-weight: bold; font-size: 30px;">绿色理念融入生活的每个细节</p>
+    
+    <div style="text-align: center; margin: 20px 0;">
+        <img src="images/设计师头像/绿色设计师.jpg" style="display: inline-block; vertical-align: middle; margin-right: 10px; width: 80px; height: 80px;">
+        <span style="display: inline-block; vertical-align: middle; font-size: 30px;">设计师：王绿意</span>
+    </div>
+</div>
+    </section>
+
+    <section id="community" class="page-section">
+        <h2 class="section-title" style="background-color: #e6e6fa;">理想家-社区</h2>
+        <!-- 社区一级切换按钮（已添加active类实现默认选中推荐） -->
+        <div class="community-tab" style="text-align: center; margin: 20px 0;">
+            <span class="tab-item active" data-target="recommend">推荐</span>
+            <span class="tab-item" data-target="follow">关注</span>
+        </div>
+        <!-- 推荐内容区域 -->
+        <div id="recommend" class="community-content active">
+            <!-- 原提示文字已删除 -->
+            
+            <!-- 二级切换按钮组（调整margin-top向上移动） -->
+            <div class="sub-tab" style="text-align: center; margin: 0px 0;">  <!-- 修改点：原margin为20px 0 -->
+                <span class="sub-tab-item active" data-target="hot">热门</span>
+                <span class="sub-tab-item" data-target="selected">精选</span>
+                <span class="sub-tab-item" data-target="list">榜单</span>
+                <span class="sub-tab-item" data-target="market">行情解读</span>
+                <span class="sub-tab-item" data-target="field">实地考察</span>
+            </div>
+            
+            <!-- 二级内容区域 -->
+            <div id="hot" class="sub-content active">
+                <!-- 新增垂直容器包裹原有内容和新增文字 -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- 原有水平排列内容 -->
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="images/设计师头像/7.jpg" alt="左侧图片" style="width: 100px; height: 100px; object-fit: cover; margin-left: -100px;">
+                        <div style="margin-left: 10px;">
+                            <p style="font-weight: bold; margin: 0; font-size: 34px; color: rgb(240, 85, 85);">行致秋色浓</p>
+                            <p style="margin: 0; font-size: 30px;">尚美小区住户</p>
+                        </div>
+                        <img src="images/社区/关注.png" alt="关注" style="width: 120px; height: auto; object-fit: contain; margin-left: 270px;">
+                    </div>
+                    <!-- 修改后的文字（添加 margin-left 向右移动） -->
+                    <p style="margin-top: 15px; margin-left: -110px; font-size: 35px; font-weight: bold; color: #666;">简洁清新北欧原木风，分享我的装修过程心得~</p>
+                    <!-- 新增图片 -->
+                    <!-- 修改点：添加 margin-left 使图片向右移动，可按需调整数值 -->
+                    <img src="images/首页/推荐/简欧.jpg" alt="北欧风案例" style="display: block; margin: 20px auto; margin-left: 350px; width: 50%; height: 500px;">
+                    <!-- 新增包含三个图片和文字的容器 -->
+                    <div style="display: flex; justify-content: center; margin: 20px auto; margin-left: 350px; gap: 10px;">
+                        <!-- 第一个图片及其右侧文字 -->
+                        <div style="display: flex; align-items: center;">
+                            <img src="images/社区/点赞.png" alt="新图片1" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">点赞</span>
+                        </div>
+                        <!-- 第二个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/评论.png" alt="新图片2" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">评论</span>
+                        </div>
+                        <!-- 第三个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/转发.png" alt="新图片3" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">转发</span>
+                        </div>
+                    </div>
+                </div>
+                 <!-- 新增垂直容器包裹原有内容和新增文字 -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- 原有水平排列内容 -->
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="images/设计师头像/8.jpg" alt="左侧图片" style="width: 100px; height: 100px; object-fit: cover; margin-left: -100px;">
+                        <div style="margin-left: 10px;">
+                            <p style="font-weight: bold; margin: 0; font-size: 34px; color: rgb(240, 85, 85);">春日暖居客</p>
+                            <p style="margin: 0; font-size: 30px;">尚美小区住户</p>
+                        </div>
+                        <img src="images/社区/关注.png" alt="关注" style="width: 120px; height: auto; object-fit: contain; margin-left: 270px;">
+                    </div>
+                    <!-- 修改后的文字（添加 margin-left 向右移动） -->
+                    <p style="margin-top: 15px; margin-left: 70px; font-size: 35px; font-weight: bold; color: #666;">日式榻榻米风的改造之旅，将闲置角落改造成书房兼客卧。</p>
+                    <!-- 新增图片 -->
+                    <!-- 修改点：添加 margin-left 使图片向右移动，可按需调整数值 -->
+                    <img src="images/首页/推荐/日式.png" alt="北欧风案例" style="display: block; margin: 20px auto; margin-left: 350px; width: 50%; height: 500px;">
+                    <!-- 新增包含三个图片和文字的容器 -->
+                    <div style="display: flex; justify-content: center; margin: 20px auto; margin-left: 350px; gap: 10px;">
+                        <!-- 第一个图片及其右侧文字 -->
+                        <div style="display: flex; align-items: center;">
+                            <img src="images/社区/点赞.png" alt="新图片1" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">点赞</span>
+                        </div>
+                        <!-- 第二个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/评论.png" alt="新图片2" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">评论</span>
+                        </div>
+                        <!-- 第三个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/转发.png" alt="新图片3" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">转发</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 新增垂直容器包裹原有内容和新增文字 -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- 原有水平排列内容 -->
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="images/设计师头像/9.png" alt="左侧图片" style="width: 100px; height: 100px; object-fit: cover; margin-left: -100px;">
+                        <div style="margin-left: 10px;">
+                            <p style="font-weight: bold; margin: 0; font-size: 34px; color: rgb(240, 85, 85);">夏阳居逸士</p>
+                            <p style="margin: 0; font-size: 30px;">尚美小区住户</p>
+                        </div>
+                        <img src="images/社区/关注.png" alt="关注" style="width: 120px; height: auto; object-fit: contain; margin-left: 270px;">
+                    </div>
+                    <!-- 修改后的文字（添加 margin-left 向右移动） -->
+                    <p style="margin-top: 15px; margin-left: 85px; font-size: 35px; font-weight: bold; color: #666;">工业风的酷炫衣帽间，水泥灰色墙面搭配黑色金属置物架。</p>
+                    <!-- 新增图片 -->
+                    <!-- 修改点：添加 margin-left 使图片向右移动，可按需调整数值 -->
+                    <img src="images/社区/水泥.png" style="display: block; margin: 20px auto; margin-left: 350px; width: 50%; height: 500px;">
+                    <!-- 新增包含三个图片和文字的容器 -->
+                    <div style="display: flex; justify-content: center; margin: 20px auto; margin-left: 350px; gap: 10px;">
+                        <!-- 第一个图片及其右侧文字 -->
+                        <div style="display: flex; align-items: center;">
+                            <img src="images/社区/点赞.png" alt="新图片1" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">点赞</span>
+                        </div>
+                        <!-- 第二个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/评论.png" alt="新图片2" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">评论</span>
+                        </div>
+                        <!-- 第三个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/转发.png" alt="新图片3" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">转发</span>
+                        </div>
+                    </div>
+                </div>
+                  <!-- 新增垂直容器包裹原有内容和新增文字 -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- 原有水平排列内容 -->
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="images/设计师头像/10.jpg" alt="左侧图片" style="width: 100px; height: 100px; object-fit: cover; margin-left: -100px;">
+                        <div style="margin-left: 10px;">
+                            <p style="font-weight: bold; margin: 0; font-size: 34px; color: rgb(240, 85, 85);">冬韵暖居人</p>
+                            <p style="margin: 0; font-size: 30px;">尚美小区住户</p>
+                        </div>
+                        <img src="images/社区/关注.png" alt="关注" style="width: 120px; height: auto; object-fit: contain; margin-left: 270px;">
+                    </div>
+                    <!-- 修改后的文字（添加 margin-left 向右移动） -->
+                    <p style="margin-top: 15px; margin-left: -90px; font-size: 35px; font-weight: bold; color: #666;">地中海风的儿童房设计，仿佛置身于爱琴海边。</p>
+                    <!-- 新增图片 -->
+                    <!-- 修改点：添加 margin-left 使图片向右移动，可按需调整数值 -->
+                    <img src="images/首页/推荐/简欧.jpg" style="display: block; margin: 20px auto; margin-left: 350px; width: 50%; height: 500px;">
+                    <!-- 新增包含三个图片和文字的容器 -->
+                    <div style="display: flex; justify-content: center; margin: 20px auto; margin-left: 350px; gap: 10px;">
+                        <!-- 第一个图片及其右侧文字 -->
+                        <div style="display: flex; align-items: center;">
+                            <img src="images/社区/点赞.png" alt="新图片1" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">点赞</span>
+                        </div>
+                        <!-- 第二个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/评论.png" alt="新图片2" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">评论</span>
+                        </div>
+                        <!-- 第三个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/转发.png" alt="新图片3" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">转发</span>
+                        </div>
+                    </div>
+                </div>
+                 <!-- 新增垂直容器包裹原有内容和新增文字 -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- 原有水平排列内容 -->
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="images/设计师头像/11.jpg" alt="左侧图片" style="width: 100px; height: 100px; object-fit: cover; margin-left: -100px;">
+                        <div style="margin-left: 10px;">
+                            <p style="font-weight: bold; margin: 0; font-size: 34px; color: rgb(240, 85, 85);">静雅栖居者</p>
+                            <p style="margin: 0; font-size: 30px;">尚美小区住户</p>
+                        </div>
+                        <img src="images/社区/关注.png" alt="关注" style="width: 120px; height: auto; object-fit: contain; margin-left: 270px;">
+                    </div>
+                    <!-- 修改后的文字（添加 margin-left 向右移动） -->
+                    <p style="margin-top: 15px; margin-left: 300px; font-size: 35px; font-weight: bold; color: #666;">混搭风的卧室尝试，现代简约的吊灯与复古的织物窗帘碰撞出独特火花。</p>
+                    <!-- 新增图片 -->
+                    <!-- 修改点：添加 margin-left 使图片向右移动，可按需调整数值 -->
+                    <img src="images/首页/推荐/新中式.jpg" style="display: block; margin: 20px auto; margin-left: 350px; width: 50%; height: 500px;">
+                    <!-- 新增包含三个图片和文字的容器 -->
+                    <div style="display: flex; justify-content: center; margin: 20px auto; margin-left: 350px; gap: 10px;">
+                        <!-- 第一个图片及其右侧文字 -->
+                        <div style="display: flex; align-items: center;">
+                            <img src="images/社区/点赞.png" alt="新图片1" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">点赞</span>
+                        </div>
+                        <!-- 第二个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/评论.png" alt="新图片2" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">评论</span>
+                        </div>
+                        <!-- 第三个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/转发.png" alt="新图片3" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">转发</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 新增垂直容器包裹原有内容和新增文字 -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- 原有水平排列内容 -->
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="images/设计师头像/12.jpg" alt="左侧图片" style="width: 100px; height: 100px; object-fit: cover; margin-left: -100px;">
+                        <div style="margin-left: 10px;">
+                            <p style="font-weight: bold; margin: 0; font-size: 34px; color: rgb(240, 85, 85);">光影觅居人</p>
+                            <p style="margin: 0; font-size: 30px;">尚美小区住户</p>
+                        </div>
+                        <img src="images/社区/关注.png" alt="关注" style="width: 120px; height: auto; object-fit: contain; margin-left: 270px;">
+                    </div>
+                    <!-- 修改后的文字（添加 margin-left 向右移动） -->
+                    <p style="margin-top: 15px; margin-left: -250px; font-size: 35px; font-weight: bold; color: #666;">轻奢法式的玄关布置，高级感满满。</p>
+                    <!-- 新增图片 -->
+                    <!-- 修改点：添加 margin-left 使图片向右移动，可按需调整数值 -->
+                    <img src="images/首页/推荐/摩登.png" style="display: block; margin: 20px auto; margin-left: 350px; width: 50%; height: 500px;">
+                    <!-- 新增包含三个图片和文字的容器 -->
+                    <div style="display: flex; justify-content: center; margin: 20px auto; margin-left: 350px; gap: 10px;">
+                        <!-- 第一个图片及其右侧文字 -->
+                        <div style="display: flex; align-items: center;">
+                            <img src="images/社区/点赞.png" alt="新图片1" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">点赞</span>
+                        </div>
+                        <!-- 第二个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/评论.png" alt="新图片2" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">评论</span>
+                        </div>
+                        <!-- 第三个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/转发.png" alt="新图片3" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">转发</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 新增垂直容器包裹原有内容和新增文字 -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- 原有水平排列内容 -->
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="images/设计师头像/13.jpg" alt="左侧图片" style="width: 100px; height: 100px; object-fit: cover; margin-left: -100px;">
+                        <div style="margin-left: 10px;">
+                            <p style="font-weight: bold; margin: 0; font-size: 34px; color: rgb(240, 85, 85);">花间闲居客</p>
+                            <p style="margin: 0; font-size: 30px;">尚美小区住户</p>
+                        </div>
+                        <img src="images/社区/关注.png" alt="关注" style="width: 120px; height: auto; object-fit: contain; margin-left: 270px;">
+                    </div>
+                    <!-- 修改后的文字（添加 margin-left 向右移动） -->
+                    <p style="margin-top: 15px; margin-left: -200px; font-size: 35px; font-weight: bold; color: #666;">洛可可风的少女心公主房，梦幻又浪漫。</p>
+                    <!-- 新增图片 -->
+                    <!-- 修改点：添加 margin-left 使图片向右移动，可按需调整数值 -->
+                    <img src="images/首页/推荐/自然风.jpg" style="display: block; margin: 20px auto; margin-left: 350px; width: 50%; height: 500px;">
+                    <!-- 新增包含三个图片和文字的容器 -->
+                    <div style="display: flex; justify-content: center; margin: 20px auto; margin-left: 350px; gap: 10px;">
+                        <!-- 第一个图片及其右侧文字 -->
+                        <div style="display: flex; align-items: center;">
+                            <img src="images/社区/点赞.png" alt="新图片1" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">点赞</span>
+                        </div>
+                        <!-- 第二个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/评论.png" alt="新图片2" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">评论</span>
+                        </div>
+                        <!-- 第三个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/转发.png" alt="新图片3" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">转发</span>
+                        </div>
+                    </div>
+                </div>
+                 <!-- 新增垂直容器包裹原有内容和新增文字 -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- 原有水平排列内容 -->
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="images/设计师头像/14.jpg" alt="左侧图片" style="width: 100px; height: 100px; object-fit: cover; margin-left: -100px;">
+                        <div style="margin-left: 10px;">
+                            <p style="font-weight: bold; margin: 0; font-size: 34px; color: rgb(240, 85, 85);">云水逸居士</p>
+                            <p style="margin: 0; font-size: 30px;">尚美小区住户</p>
+                        </div>
+                        <img src="images/社区/关注.png" alt="关注" style="width: 120px; height: auto; object-fit: contain; margin-left: 270px;">
+                    </div>
+                    <!-- 修改后的文字（添加 margin-left 向右移动） -->
+                    <p style="margin-top: 15px; margin-left: 50px; font-size: 35px; font-weight: bold; color: #666;">复古美式风的客厅打造，每一处细节都诉说着时光故事。</p>
+                    <!-- 新增图片 -->
+                    <!-- 修改点：添加 margin-left 使图片向右移动，可按需调整数值 -->
+                    <img src="images/首页/推荐/简欧.jpg" style="display: block; margin: 20px auto; margin-left: 350px; width: 50%; height: 500px;">
+                    <!-- 新增包含三个图片和文字的容器 -->
+                    <div style="display: flex; justify-content: center; margin: 20px auto; margin-left: 350px; gap: 10px;">
+                        <!-- 第一个图片及其右侧文字 -->
+                        <div style="display: flex; align-items: center;">
+                            <img src="images/社区/点赞.png" alt="新图片1" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">点赞</span>
+                        </div>
+                        <!-- 第二个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/评论.png" alt="新图片2" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">评论</span>
+                        </div>
+                        <!-- 第三个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/转发.png" alt="新图片3" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">转发</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 新增垂直容器包裹原有内容和新增文字 -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- 原有水平排列内容 -->
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="images/设计师头像/15.jpg" alt="左侧图片" style="width: 100px; height: 100px; object-fit: cover; margin-left: -100px;">
+                        <div style="margin-left: 10px;">
+                            <p style="font-weight: bold; margin: 0; font-size: 34px; color: rgb(240, 85, 85);">星河安居者</p>
+                            <p style="margin: 0; font-size: 30px;">尚美小区住户</p>
+                        </div>
+                        <img src="images/社区/关注.png" alt="关注" style="width: 120px; height: auto; object-fit: contain; margin-left: 270px;">
+                    </div>
+                    <!-- 修改后的文字（添加 margin-left 向右移动） -->
+                    <p style="margin-top: 15px; margin-left: -50px; font-size: 35px; font-weight: bold; color: #666;">新中式风的茶室打造，感悟东方美学的博大精深。</p>
+                    <!-- 新增图片 -->
+                    <!-- 修改点：添加 margin-left 使图片向右移动，可按需调整数值 -->
+                    <img src="images/首页/推荐/简欧.jpg" style="display: block; margin: 20px auto; margin-left: 350px; width: 50%; height: 500px;">
+                    <!-- 新增包含三个图片和文字的容器 -->
+                    <div style="display: flex; justify-content: center; margin: 20px auto; margin-left: 350px; gap: 10px;">
+                        <!-- 第一个图片及其右侧文字 -->
+                        <div style="display: flex; align-items: center;">
+                            <img src="images/社区/点赞.png" alt="新图片1" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">点赞</span>
+                        </div>
+                        <!-- 第二个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/评论.png" alt="新图片2" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">评论</span>
+                        </div>
+                        <!-- 第三个图片及其右侧文字，添加 margin-left 整体右移 -->
+                        <div style="display: flex; align-items: center; margin-left: 350px;">
+                            <img src="images/社区/转发.png" alt="新图片3" style="width: 50px; height: auto;">
+                            <span style="font-size: 24px; margin-left: 10px;">转发</span>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                
+            </div>
+            <div id="selected" class="sub-content">这里是精选内容（如编辑推荐优质案例、专家解读等）...</div>
+            <div id="list" class="sub-content">这里是榜单内容（如风格热度榜、设计师排行榜等）...</div>
+            <div id="market" class="sub-content">这里是行情解读内容（如建材价格趋势、装修成本分析等）...</div>
+            <div id="field" class="sub-content">这里是实地考察内容（如工地实拍、装修现场记录等）...</div>
+        </div>
+        <div id="follow" class="community-content">
+            <div class="content">这里是关注内容（如关注的设计师动态、收藏案例等）...</div>
+        </div>
+    </section>
+
+    <style>
+        /* 社区切换按钮样式 */
+        .community-tab {
+            display: inline-flex;
+            gap: 40px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+            /* 添加立体效果 */
+            background: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%); /* 渐变背景 */
+            border: 1px solid #ccc; /* 边框 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08); /* 阴影 */
+            transition: box-shadow 0.3s ease; /* 阴影过渡效果 */
+        }
+
+        .community-tab:hover {
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1); /* 悬停时增强阴影 */
+        }
+
+        .tab-item {
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 5px 10px;
+            position: relative;
+        }
+
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #ffd700;
+        }
+
+        /* 社区内容区域样式 */
+        .community-content {
+            display: none; /* 默认隐藏 */
+            padding: 20px;
+        }
+        .community-content.active {
+            display: block; /* 激活时显示 */
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 原有社区一级按钮处理
+            const communityBtns = document.querySelectorAll('.tab-item');
+            communityBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const targetId = this.dataset.target;
+                    showCommunityContent(targetId);
+                });
+            });
+
+            // 新增二级按钮处理逻辑
+            const subTabItems = document.querySelectorAll('.sub-tab-item');
+            subTabItems.forEach(item => {
+                item.addEventListener('click', function () {
+                    const targetId = this.dataset.target;
+                    // 切换按钮激活状态
+                    subTabItems.forEach(subItem => subItem.classList.remove('active'));
+                    this.classList.add('active');
+                    // 切换对应内容显示
+                    const subContents = document.querySelectorAll('.sub-content');
+                    subContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetId) content.classList.add('active');
+                    });
+                });
+            });
+        });
+
+        // 修正：社区内容切换函数（关键修改点）
+        function showCommunityContent(id) {
+            // 切换按钮状态（修正选择器为.tab-item）
+            const communityBtns = document.querySelectorAll('.tab-item');  // 原错误选择器为.community-btn
+            communityBtns.forEach(btn => {
+                btn.classList.remove('active');  // 先移除所有按钮的active类
+                if (btn.dataset.target === id) {
+                    btn.classList.add('active');  // 给目标按钮添加active类（触发黄色下划线）
+                }
+            });
+
+            // 切换内容显示（原有逻辑正确）
+            const communityContents = document.querySelectorAll('.community-content');
+            communityContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === id) {
+                    content.classList.add('active');
+                }
+            });
+        }
+    </script>
+
+     <section id="cart" class="page-section">
+        <h2 class="section-title">理想家一站购</h2>
+        
+        <!-- 购物车顶部导航栏部分（修改） -->
+        <div class="nav-bar cart-top-nav" style="display: none; margin-top: 855px; justify-content: space-between; padding: 0 20px;">
+            <span class="nav-item" style="font-size: 24px; cursor: pointer; display: flex; align-items: center; gap: 0px; white-space: nowrap; flex-shrink: 0;">
+                全选
+                <span class="all-checkbox" style="font-size: 24px; color: #666;">○</span>  <!-- 添加全选复选框标识 -->
+            </span>
+            <!-- 添加onclick事件 -->
+            <div class="nav-item" style="display: flex; flex-direction: column; align-items: center; cursor: pointer;" onclick="goToCheckout()">
+                <span id="total-price" style="font-size: 20px; color: #333; margin-bottom: 4px;">合计：￥0.00</span>  <!-- 添加金额显示ID -->
+                <span style="font-size: 24px; font-weight: bold; color: #ff4747;">结算</span>
+            </div>
+        </div>
+        
+        <!-- 蜀门家具旗舰店部分（修改） -->
+        <div class="content">
+            <p style="text-align: center; font-weight: bold; font-size: 40px; margin-left: -720px;">
+                <!-- 添加data-store属性标识店铺，添加点击事件 -->
+                <span class="store-checkbox" data-store="蜀门家具旗舰店" onclick="toggleStoreCheck(this)" style="margin-right: 15px; font-size: 40px; cursor: pointer;">○</span>
+                蜀门家具旗舰店
+            </p>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                <!-- 添加data-store属性和点击事件 -->
+                <span class="store-checkbox" data-store="蜀门家具旗舰店" data-price="58.49" onclick="toggleItemCheck(this)" style="font-size: 38px; margin-right: 10px; cursor: pointer; vertical-align: middle;">○</span>
+                <img src="images/购物车/花瓶.jpg" style="max-width: 12%; width: 12%;">
+                <p style="font-size: 38px; margin-top: -100px;">蜀门北欧创意白色陶瓷装饰干花花瓶桌面摆件</p>
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <p style="font-size: 40px; font-weight: bold; color: red; margin-left: -780px; margin-top: 50px;">￥58.49</p>
+                    <div style="display: flex; align-items: center; margin-left: -780px; margin-top: -20px;">
+                        <button onclick="decreaseQuantity()" style="font-size: 30px; padding: 5px 10px;">-</button>
+                        <p id="quantity" style="font-size: 30px; margin: 0 15px;">1</p>
+                        <button onclick="increaseQuantity()" style="font-size: 30px; padding: 5px 10px;">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                <!-- 添加data-store属性和点击事件 -->
+                <span class="store-checkbox" data-store="蜀门家具旗舰店" data-price="499.76" onclick="toggleItemCheck(this)" style="font-size: 38px; margin-right: 10px; cursor: pointer; vertical-align: middle;">○</span>
+                <img src="images/购物车/圆桌.png" style="max-width: 12%; width: 12%;">
+                <p style="font-size: 38px; margin-top: -100px;">轻奢现代北欧简约创意圆形家具铁艺收纳桌子</p>
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <p style="font-size: 40px; font-weight: bold; color: red; margin-left: -780px; margin-top: 50px;">￥499.76</p>
+                    <div style="display: flex; align-items: center; margin-left: -780px; margin-top: -20px;">
+                        <button onclick="decreaseQuantity()" style="font-size: 30px; padding: 5px 10px;">-</button>
+                        <p id="quantity" style="font-size: 30px; margin: 0 15px;">1</p>
+                        <button onclick="increaseQuantity()" style="font-size: 30px; padding: 5px 10px;">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <!-- 雅蕾家居旗舰店部分（关键修改） -->
+            <div class="content">
+                <!-- 修正：使用独立的data-store属性 -->
+                <p style="text-align: center; font-weight: bold; font-size: 40px; margin-left: -720px;">
+                    <span class="store-checkbox" data-store="雅蕾家居旗舰店" style="margin-right: 15px; font-size: 40px; cursor: pointer;">○</span>
+                    雅蕾家居旗舰店
+                </p>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                    <!-- 修正：使用独立的data-store属性 -->
+                    <span class="store-checkbox" data-store="雅蕾家居旗舰店" style="font-size: 38px; margin-right: 10px; cursor: pointer; vertical-align: middle;">○</span>
+                    <img src="images/购物车/挂画.jpg" style="max-width: 12%; width: 12%;">
+                    <p style="font-size: 38px; margin-top: -100px;">北欧风格高级感奶油风猫咪餐厅客厅装饰挂画</p>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                        <p style="font-size: 40px; font-weight: bold; color: red; margin-left: -780px; margin-top: 50px;">￥122.21</p>
+                        <div style="display: flex; align-items: center; margin-left: -780px; margin-top: -20px;">
+                            <button onclick="decreaseQuantity()" style="font-size: 30px; padding: 5px 10px;">-</button>
+                            <p id="quantity" style="font-size: 30px; margin: 0 15px;">1</p>
+                            <button onclick="increaseQuantity()" style="font-size: 30px; padding: 5px 10px;">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+    </section>
+    <!-- ... 已有代码 ... -->
+
+    <script>
+        // 获取数量显示元素
+        const quantityElement = document.getElementById('quantity');
+        // 初始化数量
+        let quantity = 1;
+
+        // 减少数量的函数
+        function decreaseQuantity() {
+            if (quantity > 1) {
+                quantity--;
+                quantityElement.textContent = quantity;
+            }
+        }
+
+        // 增加数量的函数
+        function increaseQuantity() {
+            quantity++;
+            quantityElement.textContent = quantity;
+        }
+    </script>
+
+    <section id="profile" class="page-section">
+        <h2 class="section-title">理想家-个人中心</h2>
+        <!-- 使用内联样式缩小图片 -->
+        <img src="images/收银台/logo.jpg" class="content-image" alt="个人中心宣传图" style="max-width: 10%; width: 20%;">
+        <p style="text-align: center; font-size: 35px; color: #333;">用户：23165131</p>
+        <p style="text-align: center; font-size: 30px; color: #333;">欢迎来到个人中心，开启美好家居之旅！</p>
+         <!-- 新增无框表格 -->
+          <table border="0" style="width: 80%; margin: 20px auto; border-collapse: collapse;">
+            <!-- 第一行 -->
+            <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: center;"> <!-- 新增justify-content:center -->
+                    <img src="images/个人中心/待付款.png" alt="订单" style="width: 50px; height: 50px; margin-right: 20px;">
+                    <span style="font-size: 28px; color: #333;">待付款</span>
+                </td>
+            </tr>
+            <!-- 第二行 -->
+            <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: center;"> <!-- 新增justify-content:center -->
+                    <img src="images/个人中心/待收货.jpg" alt="收藏" style="width: 50px; height: 50px; margin-right: 20px;">
+                    <span style="font-size: 28px; color: #333;">待收货</span>
+                </td>
+            </tr>
+            <!-- 第三行 -->
+            <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: center;"> <!-- 新增justify-content:center -->
+                    <img src="images/个人中心/待评价.jpg" alt="设置" style="width: 50px; height: 50px; margin-right: 20px;">
+                    <span style="font-size: 28px; color: #333;">待评价</span>
+                </td>
+            </tr>
+            <!-- 第四行 -->
+            <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: center;"> <!-- 新增justify-content:center -->
+                    <img src="images/个人中心/售后中.png" alt="帮助" style="width: 50px; height: 50px; margin-right: 20px;">
+                    <span style="font-size: 28px; color: #333;">售后中</span>
+                </td>
+            </tr>
+        </table>
+    </section>
+
+    <div class="nav-bar">
+        <a href="#" class="nav-item" onclick="showSection('home', this)">🏠<br>首页</a>
+        <a href="#" class="nav-item" onclick="showSection('community', this)">👥<br>社区</a>
+        <a href="#" class="nav-item" onclick="showSection('cart', this)">🛒<br>购物车</a>
+        <a href="#" class="nav-item" onclick="showSection('profile', this)">👤<br>我的</a>
+    </div>
+
+    <script>
+        const imageList = document.getElementById('imageList');
+        const dots = document.querySelectorAll('.dot');
+        let currentIndex = 0;
+        let autoScrollInterval;
+
+        function changeImage(index) {
+            currentIndex = index;
+            imageList.style.transform = `translateX(-${currentIndex * 33.333}%)`;
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
+            resetAutoScroll();
+        }
+
+        function autoScroll() {
+            currentIndex = (currentIndex + 1) % 3;
+            changeImage(currentIndex);
+        }
+
+        function resetAutoScroll() {
+            clearInterval(autoScrollInterval);
+            autoScrollInterval = setInterval(autoScroll, 5000);
+        }
+
+        function showSection(id, caller) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            const target = document.getElementById(id);
+            if (target) {
+                target.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'auto' });
+            }
+            document.querySelectorAll('.nav-bar .nav-item').forEach(item => item.classList.remove('active'));
+            if (caller) caller.classList.add('active');
+
+            // 新增导航栏显示控制（关键修改）
+            const cartTopNav = document.querySelector('.cart-top-nav');
+            if (id === 'cart') {
+                cartTopNav.style.display = 'flex';
+            } else {
+                cartTopNav.style.display = 'none';
+            }
+        }
+
+        function showNewContent(id) {
+            document.querySelectorAll('.new-content').forEach(div => div.style.display = 'none');
+            const target = document.getElementById(id);
+            if (target) target.style.display = 'block';
+            document.querySelectorAll('.new-nav-bar .nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`.new-nav-bar .nav-item[onclick="showNewContent('${id}')"]`).classList.add('active');
+        }
+
+        window.onload = function () {
+            const homeNavItem = document.querySelector('.nav-bar .nav-item[onclick="showSection(\'home\', this)"]');
+            showSection('home', homeNavItem);
+            resetAutoScroll();
+            showNewContent('content1');
+            showCommunityContent('recommend');  // 初始化调用推荐内容
+        }
+    </script>
+    
+    <!-- 图片放大模态框 -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+    
+    <!-- 环保弹窗 -->
+    <div id="ecoModal" class="eco-modal">
+        <div class="eco-modal-content">
+            <span class="eco-close">&times;</span>
+            <img src="images/首页/环保弹窗.jpg" alt="环保弹窗" class="eco-image">
+        </div>
+    </div>
+
+    <style>
+        /* 二级切换按钮样式 */
+        .sub-tab {
+            display: flex;
+            gap: 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            justify-content: space-between;
+            width: 100%;
+            box-sizing: border-box;
+            /* 添加立体效果 */
+            background: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%);
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .sub-tab:hover {
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sub-tab-item {
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 5px 10px;
+            position: relative;
+        }
+
+        .sub-tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: blue;
+        }
+
+        .sub-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .sub-content.active {
+            display: block;
+        }
+    </style>
+
+    <script>
+        // ... 原有脚本 ...
+
+        // 新增：核心复选框切换逻辑
+        function toggleStoreCheck(storeCheckbox) {
+            const storeName = storeCheckbox.dataset.store;
+            const allChecks = document.querySelectorAll(`.store-checkbox[data-store="${storeName}"]`);
+            const isChecked = storeCheckbox.textContent === '✓'; // 检查当前是否已选中
+            
+            // 切换店铺复选框状态
+            storeCheckbox.textContent = isChecked ? '○' : '✓';
+            storeCheckbox.style.color = isChecked ? '#666' : 'red';
+        
+            // 联动商品复选框状态
+            allChecks.forEach(check => {
+                if (check !== storeCheckbox) { // 跳过店铺名称复选框自身
+                    check.textContent = isChecked ? '○' : '✓';
+                    check.style.color = isChecked ? '#666' : 'red';
+                }
+            });
+        
+            calculateTotalPrice(); // 更新金额
+        }
+
+        function toggleItemCheck(itemCheckbox) {
+            const isChecked = itemCheckbox.textContent === '✓';
+            itemCheckbox.textContent = isChecked ? '○' : '✓';
+            itemCheckbox.style.color = isChecked ? '#666' : 'red';
+            calculateTotalPrice(); // 更新金额
+        }
+
+        function calculateTotalPrice() {
+            const checkedItems = document.querySelectorAll('.store-checkbox[data-price]:not([data-price=""])');
+            let total = 0;
+        
+            checkedItems.forEach(item => {
+                if (item.textContent === '✓') { // 只计算选中的商品
+                    total += parseFloat(item.dataset.price);
+                }
+            });
+        
+            document.getElementById('total-price').textContent = `合计：￥${total.toFixed(2)}`;
+        }
+    </script>
+    
+    <script>
+        // 图片放大查看功能
+        function setupImageZoom() {
+            // 为优选设计部分的图片添加点击事件
+            const designImages = document.querySelectorAll('#content2 .highlight-cell img');
+            
+            designImages.forEach(img => {
+                img.addEventListener('click', function() {
+                    const modal = document.getElementById("imageModal");
+                    const modalImg = document.getElementById("modalImage");
+                    modal.style.display = "block";
+                    modalImg.src = this.src;
+                });
+            });
+
+            // 关闭模态框功能
+            const modal = document.getElementById("imageModal");
+            const closeBtn = document.querySelector(".close");
+
+            closeBtn.onclick = function() {
+                modal.style.display = "none";
+            };
+
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            };
+            
+            // ESC键关闭模态框
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.style.display === 'block') {
+                    modal.style.display = "none";
+                }
+            });
+        }
+
+        // 环保弹窗功能
+        function setupEcoModal() {
+            // 获取环保弹窗和关闭按钮
+            const ecoModal = document.getElementById("ecoModal");
+            const ecoCloseBtn = document.querySelector(".eco-close");
+
+            // 显示环保弹窗（页面加载后延迟显示）
+            setTimeout(function() {
+                ecoModal.style.display = "block";
+            }, 1000);
+
+            // 点击关闭按钮关闭弹窗
+            ecoCloseBtn.onclick = function() {
+                ecoModal.style.display = "none";
+            };
+
+            // 点击弹窗外部区域关闭弹窗
+            window.onclick = function(event) {
+                if (event.target === ecoModal) {
+                    ecoModal.style.display = "none";
+                }
+            };
+        }
+
+        // 在DOM加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            setupImageZoom();
+            setupEcoModal();
+        });
+    </script>
+    
+    <script>
+        // 新增：跳转页面的函数
+        function goToCheckout() {
+            // 跳转到指定页面（可根据实际需求修改路径）
+            window.location.href = "shopping-cart.html";
+        }
+    </script>
+</body>
+
+</html>
